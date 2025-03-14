@@ -14,7 +14,9 @@ jobs:
     build-spring-boot:
         permissions: write-all
         runs-on: ubuntu-latest
-        steps:
+        outputs:
+          SNAPSHOT: ${{ steps.snapshot.outputs.SNAPSHOT }}
+        steps:  
             - name: Checkout Repo
               uses: actions/checkout@v4
 
@@ -42,8 +44,9 @@ jobs:
                 mvn clean deploy --file pom.xml
               
             - name: Check the Jar availability on the GCP artifactory
+              id: snapshot
               run : |
-                SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}') >> $GITHUB_ENV
+                echo "SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}')" >> $GITHUB_OUTPUT
                 gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${SNAPSHOT}
     dockerization:
         name: Containerization
@@ -74,6 +77,6 @@ jobs:
                 JAR=$(gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${SNAPSHOT} | grep jar | head -1 | awk '{print $1}' |cut -d "/" -f 5) >> $GITHUB_ENV
                 echo $JAR
                 echo "TEST"
-                curl -X GET -H "Authorization: Bearer $(gcloud auth print-access-token)" --output demo-0.0.1-20250314.103531-1.jar "https://artifactregistry.googleapis.com/download/v1/projects/gcp-gke-453620/locations/europe-west3/repositories/java-maven/files/com%2Fexample%2Fdemo%2F${SNAPSHOT}%2F${JAR}:download?alt=media"
+                curl -X GET -H "Authorization: Bearer $(gcloud auth print-access-token)" --output demo-0.0.1-20250314.103531-1.jar "https://artifactregistry.googleapis.com/download/v1/projects/gcp-gke-453620/locations/europe-west3/repositories/java-maven/files/com%2Fexample%2Fdemo%2F'${SNAPSHOT}'%2F'${JAR}':download?alt=media"
 
                 ls -lrth | grep "SNAPSHOT"
