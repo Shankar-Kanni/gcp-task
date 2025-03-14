@@ -40,3 +40,46 @@ jobs:
             - name: Run spring boot
               run: |
                 mvn clean deploy --file pom.xml
+              
+            - name: Check the Jar availability on the GCP artifactory
+              run : |
+                SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}')
+                gcloud artifacts files list \
+                --project=gcp-gke-453620 \
+                --repository=java-maven \
+                --location=europe-west3 \
+                --package=com.example:demo \
+                --version={$SNAPSHOT} | grep jar | head -1
+    dockerization:
+        name: Containerization
+        needs: [build-spring-boot]
+        permissions: write-all
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v4
+
+            - name: Authenticate to GCP account
+              uses: 'google-github-actions/auth@v2'
+              with:
+                project_id: ${{ secrets.PROJECTID }}
+                workload_identity_provider: ${{ secrets.workload_identity_provider }}
+                service_account: ${{ secrets.service_account }}
+
+            - name: Download the jar file
+              run: |
+                SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}')
+
+                JAR=$(gcloud artifacts files list \
+                --project=gcp-gke-453620 \
+                --repository=java-maven \
+                --location=europe-west3 \
+                --package=com.example:demo \
+                --version={$SNAPSHOT} | grep jar | head -1 | cut -d "/" -f 5)
+
+                curl -X GET \
+                -H "Authorization: Bearer $(gcloud auth print-access-token)" \
+                --output demo-0.0.1-20250314.103531-1.jar \
+                "https://artifactregistry.googleapis.com/download/v1/projects/gcp-gke-453620/locations/europe-west3/repositories/java-maven/files/com%2Fexample%2Fdemo%2F{$SNAPSHOT}%2F{$JAR}:download?alt=media"
+
+                ls -lrth | grep "SNAPSHOT"
