@@ -79,4 +79,4 @@ jobs:
                 echo $URL | sed 's/# /%2F/'
                 curl -X GET -k -H "Authorization: Bearer $(gcloud auth print-access-token)" --output spring-boot.jar -k "$(echo $URL | sed 's/# /%2F/')"
 
-                ls -lrth | grep "SNAPSHOT"
+                ls -lrth | grep "jar"
