@@ -44,7 +44,7 @@ jobs:
             - name: Check the Jar availability on the GCP artifactory
               run : |
                 SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}') >> $GITHUB_ENV
-                gcloud artifacts files list --project=gcp-gke-453620 --repository=java-maven --location=europe-west3 --package=com.example:demo --version=${SNAPSHOT}
+                gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${SNAPSHOT}
     dockerization:
         name: Containerization
         needs: [build-spring-boot]
@@ -61,11 +61,16 @@ jobs:
                 workload_identity_provider: ${{ secrets.workload_identity_provider }}
                 service_account: ${{ secrets.service_account }}
 
+            - name: 'Set up Cloud SDK'
+              uses: 'google-github-actions/setup-gcloud@v2'
+              with:
+                version: '>= 363.0.0'
+
             - name: Download the jar file
               run: |
                 SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}') >> $GITHUB_ENV
                 echo $SNAPSHOT
-                JAR=$(gcloud artifacts files list --project=gcp-gke-453620 --repository=java-maven --location=europe-west3 --package=com.example:demo --version=${SNAPSHOT} | grep jar | head -1 | cut -d "/" -f 5) >> $GITHUB_ENV
+                JAR=$(gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${SNAPSHOT} | grep jar | head -1 | cut -d "/" -f 5) >> $GITHUB_ENV
                 echo $JAR
                 curl -X GET -H "Authorization: Bearer $(gcloud auth print-access-token)" --output demo-0.0.1-20250314.103531-1.jar "https://artifactregistry.googleapis.com/download/v1/projects/gcp-gke-453620/locations/europe-west3/repositories/java-maven/files/com%2Fexample%2Fdemo%2F${SNAPSHOT}%2F${JAR}:download?alt=media"
 
