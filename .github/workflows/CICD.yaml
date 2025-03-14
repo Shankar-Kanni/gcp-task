@@ -1,0 +1,41 @@
+name: Spring Boot CI/CD using microk8s on GCP VM
+
+on:
+    push: 
+      paths-ignore: 
+        - 'README.md'
+        - '.github/**'
+      branches: 
+        - main
+        - master
+    workflow_dispatch:         
+
+jobs:
+    build-spring-boot:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Repo
+              uses: actions/checkout@v4
+
+            - name: Authenticate to GCP account
+              uses: 'google-github-actions/auth@v2'
+              with:
+                project_id: ${{ secrets.PROJECTID }}
+                workload_identity_provider: ${{ secrets.workload_identity_provider }}
+                service_account: ${{ secrets.service_account }}
+              
+
+            - name: Setup required Java JDK
+              uses: actions/setup-java@v4
+              with:
+                distribution: 'zulu' # See 'Supported distributions' for available options
+                java-version: '17'
+
+            - name: 'Set up Cloud SDK'
+              uses: 'google-github-actions/setup-gcloud@v2'
+              with:
+                version: '>= 363.0.0'
+                
+            - name: Run spring boot
+              run: |
+                mvn clean deploy --file pom.xml
