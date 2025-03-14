@@ -12,6 +12,7 @@ on:
 
 jobs:
     build-spring-boot:
+        permissions: write-all
         runs-on: ubuntu-latest
         steps:
             - name: Checkout Repo
@@ -35,7 +36,7 @@ jobs:
               uses: 'google-github-actions/setup-gcloud@v2'
               with:
                 version: '>= 363.0.0'
-                
+
             - name: Run spring boot
               run: |
                 mvn clean deploy --file pom.xml
