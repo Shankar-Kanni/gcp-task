@@ -43,7 +43,7 @@ jobs:
               
             - name: Check the Jar availability on the GCP artifactory
               run : |
-                SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}')
+                SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}') >> $GITHUB_ENV
                 gcloud artifacts files list \
                 --project=gcp-gke-453620 \
                 --repository=java-maven \
@@ -68,14 +68,14 @@ jobs:
 
             - name: Download the jar file
               run: |
-                SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}')
+                SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}') >> $GITHUB_ENV
 
                 JAR=$(gcloud artifacts files list \
                 --project=gcp-gke-453620 \
                 --repository=java-maven \
                 --location=europe-west3 \
                 --package=com.example:demo \
-                --version={$SNAPSHOT} | grep jar | head -1 | cut -d "/" -f 5)
+                --version={$SNAPSHOT} | grep jar | head -1 | cut -d "/" -f 5) >> $GITHUB_ENV
 
                 curl -X GET \
                 -H "Authorization: Bearer $(gcloud auth print-access-token)" \
