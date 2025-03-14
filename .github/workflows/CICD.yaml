@@ -76,7 +76,7 @@ jobs:
                 echo $JAR
                 echo "TEST"
                 URL="https://artifactregistry.googleapis.com/download/v1/projects/gcp-gke-453620/locations/europe-west3/repositories/java-maven/files/com%2Fexample%2Fdemo#${SNAPSHOT}#${JAR}:download?alt=media"
-                echo $URL | sed 's/# /%2F/'| sed 's/#//'
-                curl -X GET -k -H "Authorization: Bearer $(gcloud auth print-access-token)" --output spring-boot.jar -k "$(echo $URL | sed 's/# /%2F/'| sed 's/#//')"
+                echo $URL | sed 's/# /%2F/'| sed 's/#/%2F/'
+                curl -X GET -k -H "Authorization: Bearer $(gcloud auth print-access-token)" --output spring-boot.jar -k "$(echo $URL | sed 's/# /%2F/'| sed 's/#/%2F/')"
 
                 ls -lrth | grep "jar"
