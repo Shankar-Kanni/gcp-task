@@ -70,6 +70,7 @@ jobs:
               run: |
                 SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}') >> $GITHUB_ENV
                 echo $SNAPSHOT
+                gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${SNAPSHOT} | grep jar | head -1
                 JAR=$(gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${SNAPSHOT} | grep jar | head -1 | cut -d "/" -f 5) >> $GITHUB_ENV
                 echo $JAR
                 echo "TEST"
