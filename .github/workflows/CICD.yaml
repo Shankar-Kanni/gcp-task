@@ -69,14 +69,14 @@ jobs:
             - name: Download the jar file
               run: |
                 SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}') >> $GITHUB_ENV
-
+                echo $SNAPSHOT
                 JAR=$(gcloud artifacts files list \
                 --project=gcp-gke-453620 \
                 --repository=java-maven \
                 --location=europe-west3 \
                 --package=com.example:demo \
                 --version=${SNAPSHOT} | grep jar | head -1 | cut -d "/" -f 5) >> $GITHUB_ENV
-
+                echo $JAR
                 curl -X GET \
                 -H "Authorization: Bearer $(gcloud auth print-access-token)" \
                 --output demo-0.0.1-20250314.103531-1.jar \
