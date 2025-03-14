@@ -77,7 +77,7 @@ jobs:
                 echo "TEST"
                 URL="https://artifactregistry.googleapis.com/download/v1/projects/gcp-gke-453620/locations/europe-west3/repositories/java-maven/files/com%2Fexample%2Fdemo#${SNAPSHOT}#${JAR}:download?alt=media"
                 echo $URL | sed 's/# /%2F/'| sed 's/#/%2F/'
-                curl -X GET -k -H "Authorization: Bearer $(gcloud auth print-access-token)" --output spring-boot.jar -k "$(echo $URL | sed 's/# /%2F/'| sed 's/#/%2F/')"
+                curl -X GET -k -H "Authorization: Bearer $(gcloud auth print-access-token)" --output deployment/spring-boot.jar -k "$(echo $URL | sed 's/# /%2F/'| sed 's/#/%2F/')"
 
                 ls -lrth | grep "jar"
 
@@ -87,5 +87,5 @@ jobs:
                 gcloud auth configure-docker europe-west3-docker.pkg.dev
 
                 IMAGE_TAG=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}'|sed 's/-SNAPSHOT//')
-
-                docker build -f Dockerfile --tag "europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot:$IMAGE_TAG"
+                echo $IMAGE_TAG
+                docker build -f Dockerfile --tag "europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot:$IMAGE_TAG" .
