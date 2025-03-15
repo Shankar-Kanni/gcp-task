@@ -8,7 +8,7 @@ public class HelloWorldController
 @RequestMapping("/api/hello")  
 public String hello()   
 {  
-return "Hello Shankar, This is your first CI/CD project";  
+return "Hello Shankar, This is your demo CI/CD project";  
 
 }  
 }  
