@@ -84,8 +84,8 @@ jobs:
             - name: Build docker image and push to Artifactory
               run: |
                 
-                # gcloud auth configure-docker europe-west3-docker.pkg.dev
-                cat ${{ github.workspace }}/gha-creds*.json | base64 | docker login -u _json_key_base64 --password-stdin https://europe-west3-docker.pkg.dev
+                gcloud auth configure-docker europe-west3-docker.pkg.dev -Y
+                # cat ${{ github.workspace }}/gha-creds*.json | base64 | docker login -u _json_key_base64 --password-stdin https://europe-west3-docker.pkg.dev
 
                 IMAGE_TAG=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}'|sed 's/-SNAPSHOT//')
                 IMAGE_TAG=$(echo $IMAGE_TAG | sed -e 's/^[ \t]*//')
