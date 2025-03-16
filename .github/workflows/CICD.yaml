@@ -18,6 +18,7 @@ jobs:
     build-spring-boot:
         permissions: write-all
         runs-on: ubuntu-latest
+        if: github.event.pull_request.merged == true
         steps:  
             - name: Checkout Repo
               uses: actions/checkout@v4
