@@ -11,4 +11,8 @@ public String hello()
 return "Hello Shankar, This is your demo CI/CD project";  
 
 }  
+@GetMapping(value = "/ping")
+public ResponseEntity<String> ping() {
+  return ResponseEntity.ok("{\"status\":\"OK\"}");
+}
 }  
