@@ -8,11 +8,8 @@ public class HelloWorldController
 @RequestMapping("/api/hello")  
 public String hello()   
 {  
-return "Hello Shankar, This is your demo CI/CD project";  
+return "Hello World CI/CD App up and running";  
 
 }  
-@GetMapping(value = "/ping")
-public ResponseEntity<String> ping() {
-  return ResponseEntity.ok("{\"status\":\"OK\"}");
-}
+
 }  
