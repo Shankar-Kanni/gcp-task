@@ -126,7 +126,8 @@ jobs:
                 version: '>= 363.0.0'
             - name: Install the gcloud and kubectl and also deploy the app using helm
               run: |
-
+                IMAGE_TAG=${{ needs.dockerization.outputs.IMAGE_TAG }} >> $GITHUB_ENV
+                echo $IMAGE_TAG
                 gcloud --version
                 gcloud components install kubectl
                 gcloud container clusters list --project gcp-gke-453620

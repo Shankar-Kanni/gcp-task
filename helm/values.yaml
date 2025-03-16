@@ -9,7 +9,7 @@ image:
   imageName: spring-boot-app-v1
   pullPolicy: IfNotPresent
   # Overrides the image tag whose default is the chart appVersion.
-  tag: "v1"
+  tag: ""
   port: 8080
 
 imagePullSecrets: []
