@@ -8,9 +8,10 @@ on:
             description: "Environment on which application needs to be deployed"
             type: string
             required: true
+
 jobs:
     Deploy:
-        permissions: write-all
+        
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
