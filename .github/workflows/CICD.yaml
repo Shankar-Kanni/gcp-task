@@ -6,8 +6,8 @@ on:
         - 'README.md'
         - '.github/**'
       branches: 
-        - main
-        - master
+        - dev
+        - test
     pull_request:
       types:
         - closed  
