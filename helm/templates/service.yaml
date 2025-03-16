@@ -1,16 +1,15 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "spring-boot.fullname" . }}
+  name: {{ include "spring.fullname" . }}
   labels:
-    {{- include "spring-boot.labels" . | nindent 4 }}
+    {{- include "spring.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
     - port: {{ .Values.service.port }}
       targetPort: 8080
-      protocol: TCP
-      name: 8080
-      nodePort: 30007
+      name: http
+      # nodePort: 30007  
   selector:
-    {{- include "spring-boot.selectorLabels" . | nindent 4 }}
+    {{- include "spring.selectorLabels" . | nindent 4 }}
