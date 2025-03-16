@@ -120,6 +120,7 @@ jobs:
           namespace: dev
         permissions:
           id-token: write
+        secrets: inherit
     deployment_on_prod:
         name: Prod Deployment
         if: github.ref == 'refs/heads/main'
@@ -129,3 +130,4 @@ jobs:
           namespace: dev
         permissions:
           id-token: write
+        secrets: inherit
