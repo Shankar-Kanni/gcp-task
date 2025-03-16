@@ -123,11 +123,11 @@ jobs:
         secrets: inherit
     deployment_on_prod:
         name: Prod Deployment
-        if: github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && always()
         needs: dockerization
         uses: ./.github/workflows/Deploy.yaml
         with:
-          namespace: dev
+          namespace: prod
         permissions:
           id-token: write
         secrets: inherit
