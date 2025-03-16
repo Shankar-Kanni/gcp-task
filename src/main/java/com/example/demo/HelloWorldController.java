@@ -8,7 +8,7 @@ public class HelloWorldController
 @RequestMapping("/api/hello")  
 public String hello()   
 {  
-return "Hello World..!!  CI/CD App up and running ('_')";  
+return "Hello World..!!  CI/CD App up and running";  
 
 }  
 
