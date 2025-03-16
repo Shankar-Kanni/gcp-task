@@ -118,6 +118,8 @@ jobs:
         uses: ./.github/workflows/Deploy.yaml
         with:
           namespace: dev
+        permissions:
+          id-token: write
     deployment_on_prod:
         name: Prod Deployment
         if: github.ref == 'refs/heads/main'
@@ -125,3 +127,5 @@ jobs:
         uses: ./.github/workflows/Deploy.yaml
         with:
           namespace: dev
+        permissions:
+          id-token: write
