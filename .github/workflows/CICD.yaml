@@ -145,7 +145,8 @@ jobs:
                 docker push europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}
     deployment_on_dev:
       name: Dev Deployment
-      if: github.ref == 'refs/heads/dev' || github.event_name == 'pull_request' && github.base_ref == 'dev'
+      if: ${{ github.event.pull_request.merged == true }}
+      # if: github.ref == 'refs/heads/dev' || github.event_name == 'pull_request' && github.base_ref == 'dev'
       needs: [dockerization]
       uses: ./.github/workflows/Deploy.yaml
       with:
@@ -156,7 +157,8 @@ jobs:
 
     deployment_on_prod:
       name: Prod Deployment
-      if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.base_ref == 'main'
+      if: ${{ github.event.pull_request.merged == true }}
+      # if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.base_ref == 'main'
       needs: [dockerization]
       uses: ./.github/workflows/Deploy.yaml
       with:
