@@ -112,22 +112,23 @@ jobs:
                 docker build -f Dockerfile --tag "europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}" .
                 docker push europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}
     deployment_on_dev:
-        name: Dev Deployment
-        if: github.ref == 'refs/heads/dev'
-        needs: dockerization
-        uses: ./.github/workflows/Deploy.yaml
-        with:
-          namespace: dev
-        permissions:
-          id-token: write
-        secrets: inherit
+      name: Dev Deployment
+      if: github.ref == 'refs/heads/dev' || github.event_name == 'pull_request' && github.base_ref == 'dev'
+      needs: [dockerization]
+      uses: ./.github/workflows/Deploy.yaml
+      with:
+        namespace: dev
+      permissions:
+        id-token: write
+      secrets: inherit
+
     deployment_on_prod:
-        name: Prod Deployment
-        if: github.ref == 'refs/heads/main'
-        needs: dockerization
-        uses: ./.github/workflows/Deploy.yaml
-        with:
-          namespace: dev
-        permissions:
-          id-token: write
-        secrets: inherit
+      name: Prod Deployment
+      if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.base_ref == 'main'
+      needs: [dockerization]
+      uses: ./.github/workflows/Deploy.yaml
+      with:
+        namespace: prod
+      permissions:
+        id-token: write
+      secrets: inherit
