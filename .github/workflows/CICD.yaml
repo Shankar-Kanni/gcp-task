@@ -179,6 +179,15 @@ jobs:
                 # echo "IMAGE_TAG=$(echo $IMAGE_TAG | sed -e 's/^[ \t]*//')" >> $GITHUB_OUTPUT
                 docker build -f Dockerfile --tag "europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}" .
                 docker push europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}
+
+                docker images
+                docker run --name spring-boot-app -d  \
+                  -p 8080:8080 \
+                  europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}
+                docker ps
+                echo Testing Image URL using wget 
+                wget -q -O - localhost:8080/api/hello | grep Hello
+                
     deployment_on_dev:
       name: Dev Deployment
       if: ${{ github.event.pull_request.merged == true }}
