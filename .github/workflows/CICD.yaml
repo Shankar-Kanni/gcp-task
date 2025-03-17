@@ -152,9 +152,9 @@ jobs:
                 JAR=$(gcloud artifacts files list --project gcp-gke-453620 --repository java-release --location europe-west3 --package com.example:demo --version 1.0.13 | grep jar | head -1 | sed -E 's/.*\/(demo-[^\/]+\.jar)/\1/' | awk '{print $1}') >> $GITHUB_ENV
                 echo $JAR
                 
-                URL="https://artifactregistry.googleapis.com/download/v1/projects/gcp-gke-453620/locations/europe-west3/repositories/java-release/files/com%2Fexample%2Fdemo#${IMAGE_TAG}#${JAR}:download?alt=media"
-                echo $URL | sed 's/# /%2F/'| sed 's/#/%2F/'
-                curl -X GET -k -H "Authorization: Bearer $(gcloud auth print-access-token)" --output spring-boot.jar -k "$(echo $URL | sed 's/# /%2F/'| sed 's/#/%2F/')"
+                URL="https://artifactregistry.googleapis.com/download/v1/projects/gcp-gke-453620/locations/europe-west3/repositories/java-release/files/com%2Fexample%2Fdemo#${IMAGE_TAG}#demo-${IMAGE_TAG}.jar:download?alt=media"
+                echo $URL | sed 's/#/%2F/g'
+                curl -X GET -k -H "Authorization: Bearer $(gcloud auth print-access-token)" --output spring-boot.jar -k "$(echo $URL | sed 's/#/%2F/g')"
 
                 ls -lrth | grep "jar"
             
