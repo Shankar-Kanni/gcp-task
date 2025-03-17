@@ -88,7 +88,6 @@ jobs:
       if: success() && github.event_name == 'pull_request'
       steps:
         - name: Post a comment if build is successful
-          if: success()  # This ensures this step only runs if the build is successful
           run: |
             pull_request_number=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
             curl -X POST \
@@ -103,9 +102,9 @@ jobs:
       permissions:
         issues: write
         pull-requests: write
+      if: failure() && github.event_name == 'pull_request'
       steps:     
         - name: Post a comment if build fails
-          if: failure()  # This ensures this step only runs if the build fails
           run: |
             curl -X POST \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
