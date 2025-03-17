@@ -6,10 +6,12 @@ on:
         - 'README.md'
         - '.github/**'
       branches: 
-        - dev
+        - test
     pull_request: 
       branches:
         - main
+        - dev
+        - release
       types:
         - closed
     workflow_dispatch:         
@@ -18,7 +20,6 @@ jobs:
     build-spring-boot:
         permissions: write-all
         runs-on: ubuntu-latest
-        if: github.event.pull_request.merged == true
         steps:  
             - name: Checkout Repo
               uses: actions/checkout@v4
@@ -111,37 +112,23 @@ jobs:
                 docker build -f Dockerfile --tag "europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}" .
                 docker push europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}
     deployment_on_dev:
-        name: Dev Deployment
-        permissions: write-all
-        if: github.ref == 'refs/heads/dev'
-        runs-on: ubuntu-latest
-        needs: dockerization
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
+      name: Dev Deployment
+      if: github.ref == 'refs/heads/dev' || github.event_name == 'pull_request' && github.base_ref == 'dev'
+      needs: [dockerization]
+      uses: ./.github/workflows/Deploy.yaml
+      with:
+        namespace: dev
+      permissions:
+        id-token: write
+      secrets: inherit
 
-            - name: Authenticate to GCP account
-              uses: 'google-github-actions/auth@v2'
-              with:
-                project_id: ${{ secrets.PROJECTID }}
-                workload_identity_provider: ${{ secrets.workload_identity_provider }}
-                service_account: ${{ secrets.service_account }}
-
-            - name: 'Set up Cloud SDK'
-              uses: 'google-github-actions/setup-gcloud@v2'
-              with:
-                version: '>= 363.0.0'
-            - name: Install the gcloud and kubectl and also deploy the app using helm
-              run: |
-                IMAGE_TAG=${{ needs.dockerization.outputs.IMAGE_TAG }} >> $GITHUB_ENV
-                echo $IMAGE_TAG
-                gcloud --version
-                gcloud components install kubectl
-                gcloud container clusters list --project gcp-gke-453620
-                gcloud container clusters get-credentials infra-dev-gke-cluster --region europe-west3 --project gcp-gke-453620
-                kubectl get nodes
-                cd helm
-                helm version
-                helm upgrade -i spring-boot -f values.yaml --set image.tag=${{ needs.dockerization.outputs.IMAGE_TAG }} . --namespace dev
-              
-        
+    deployment_on_prod:
+      name: Prod Deployment
+      if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.base_ref == 'main'
+      needs: [dockerization]
+      uses: ./.github/workflows/Deploy.yaml
+      with:
+        namespace: prod
+      permissions:
+        id-token: write
+      secrets: inherit
