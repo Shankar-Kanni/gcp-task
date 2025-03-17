@@ -49,7 +49,7 @@ jobs:
               if: ${{ github.event.pull_request.state == 'open' && github.event.action == 'opened' }} || ${{ github.event.ref == 'refs/heads/test' }}
               run: |
                 if grep -q "SNAPSHOT" pom.xml; then
-                  mvn clean deploy --file pom.xml
+                  mvn clean install --file pom.xml
                 else
                   echo "No actions required in this step"
                 fi
