@@ -62,10 +62,11 @@ jobs:
         - name: Post a comment if build is successful
           if: success()  # This ensures this step only runs if the build is successful
           run: |
+            pull_request_number=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
             curl -X POST \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Content-Type: application/json" \
-              -d '{"body": "✅ Build succeeded! Great job! 🎉}' \
+              -H "Accept: application/vnd.github.v3+json" \
+              -d "{\"body\": \"### PR - #$pull_request_number. \n ### ✅ Build succeeded! Great job! 🎉 \"}" \
               https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments
     
     Comment-PR-on-Failure: 
@@ -77,14 +78,15 @@ jobs:
           run: |
             curl -X POST \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
-              -H "Content-Type: application/json" \
-              -d '{"body": "❌ Build failed! Please check the logs. 🚨"}' \
+              -H "Accept: application/vnd.github.v3+json" \
+              -d "{\"body\": \"### PR - #$pull_request_number. \n ### ❌ Build failed! Please check the logs. 🚨 \"}" \
               https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments
               
                     
     dockerization:
         name: Containerization
         needs: [build-spring-boot]
+        if: ${{ github.event.pull_request.merged == true }}
         permissions: write-all
         runs-on: ubuntu-latest
         outputs:
