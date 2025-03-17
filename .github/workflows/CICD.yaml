@@ -53,7 +53,7 @@ jobs:
                 SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}') >> $GITHUB_ENV
                 gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${SNAPSHOT}
 
-                
+
     Comment-PR-on-Success:
       runs-on: ubuntu-latest
       needs: [build-spring-boot]
@@ -122,7 +122,7 @@ jobs:
                 gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${SNAPSHOT} | grep jar | head -1
                 JAR=$(gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${SNAPSHOT} | grep jar | head -1 | awk '{print $1}' |cut -d "/" -f 5) >> $GITHUB_ENV
                 echo $JAR
-                echo "TEST"
+                
                 URL="https://artifactregistry.googleapis.com/download/v1/projects/gcp-gke-453620/locations/europe-west3/repositories/java-maven/files/com%2Fexample%2Fdemo#${SNAPSHOT}#${JAR}:download?alt=media"
                 echo $URL | sed 's/# /%2F/'| sed 's/#/%2F/'
                 curl -X GET -k -H "Authorization: Bearer $(gcloud auth print-access-token)" --output spring-boot.jar -k "$(echo $URL | sed 's/# /%2F/'| sed 's/#/%2F/')"
@@ -161,14 +161,14 @@ jobs:
         id-token: write
       secrets: inherit
 
-    deployment_on_prod:
-      name: Prod Deployment
-      if: ${{ github.event.pull_request.merged == true }}
-      # if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.base_ref == 'main'
-      needs: [dockerization]
-      uses: ./.github/workflows/Deploy.yaml
-      with:
-        namespace: prod
-      permissions:
-        id-token: write
-      secrets: inherit
+    # deployment_on_prod:
+    #   name: Prod Deployment
+    #   if: ${{ github.event.pull_request.merged == true }}
+    #   # if: github.ref == 'refs/heads/main' || github.event_name == 'pull_request' && github.base_ref == 'main'
+    #   needs: [dockerization]
+    #   uses: ./.github/workflows/Deploy.yaml
+    #   with:
+    #     namespace: prod
+    #   permissions:
+    #     id-token: write
+    #   secrets: inherit
