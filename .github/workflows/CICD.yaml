@@ -77,7 +77,7 @@ jobs:
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
                   echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
                   gcloud artifacts files list --project gcp-gke-453620 --repository java-release --location europe-west3 --package com.example:demo --version ${VERSION}
-                fi
+                # fi
 
     Comment-PR-on-Success:
       runs-on: ubuntu-latest
