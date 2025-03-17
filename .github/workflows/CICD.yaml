@@ -48,10 +48,16 @@ jobs:
                 mvn clean deploy --file pom.xml
               
             - name: Check the Jar availability on the GCP artifactory
-              id: snapshot
+              id: jar_version
               run : |
-                SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}') >> $GITHUB_ENV
-                gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${SNAPSHOT}
+                if grep -q "SNAPSHOT" pom.xml; then
+                  cd target
+                  VERSION=$(ls *.jar | sed -E 's/.*-(.*?)-SNAPSHOT\.jar/\1/') >> $GITHUB_ENV
+                  gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${VERSION}
+                else
+                  cd target
+                  VERSION=$(ls *.jar | sed -E 's/.*-(.*)\.jar/\1/') >> $GITHUB_ENV
+                  gcloud artifacts files list --project gcp-gke-453620 --repository java-release --location europe-west3 --package com.example:demo --version ${VERSION}
 
 
     Comment-PR-on-Success:
