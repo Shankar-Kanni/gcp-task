@@ -15,8 +15,10 @@ on:
             required: true
 
 jobs:
-    Deploy:
-        
+    
+    Deploy: 
+        env:
+          IMAGE_TAG: ${{ inputs.IMAGE_TAG }}      
         runs-on: ubuntu-latest
         steps:
             - name: Checkout
@@ -36,7 +38,7 @@ jobs:
             - name: Install the gcloud and kubectl and also deploy the app using helm
               run: |
                 
-                IMAGE_TAG=${{ inputs.IMAGE_TAG }}
+                # IMAGE_TAG=${{ inputs.IMAGE_TAG }}
                 echo $IMAGE_TAG
                 gcloud --version
                 gcloud components install kubectl
