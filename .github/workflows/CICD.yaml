@@ -46,13 +46,13 @@ jobs:
                 version: '>= 363.0.0'
 
             - name: Build SNAPSHOT jar
-              if: ${{ github.event.pull_request.state == 'open' && github.event.action == 'opened' }} || ${{ github.event.ref == 'refs/heads/test' }}
+              if: ${{ github.event.pull_request.merged == false }} || ${{ github.event.ref == 'refs/heads/test' }}
               run: |
-                if grep -q "SNAPSHOT" pom.xml; then
-                  mvn clean install --file pom.xml
-                else
-                  echo "No actions required in this step"
-                fi
+                #if grep -q "SNAPSHOT" pom.xml; then
+                mvn clean install --file pom.xml
+                # else
+                #   echo "No actions required in this step"
+                # fi
 
             - name: Build the final release jar
               if: ${{ github.event.pull_request.merged == true }}
@@ -63,15 +63,16 @@ jobs:
               
             - name: Check the Jar availability on the GCP artifactory
               id: jar_version
+              if: ${{ github.event.pull_request.merged == true }}
               run : |
-                if grep -q "SNAPSHOT" pom.xml; then
-                  cd .m2/repository/
-                  ls *.jar
-                  VERSION=$(ls *.jar | sed -E 's/.*-(.*?)-SNAPSHOT\.jar/\1/')
-                  echo "VERSION=$VERSION" >> $GITHUB_ENV
-                  echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+                # if grep -q "SNAPSHOT" pom.xml; then
+                #   cd .m2/repository/
+                #   ls *.jar
+                #   VERSION=$(ls *.jar | sed -E 's/.*-(.*?)-SNAPSHOT\.jar/\1/')
+                #   echo "VERSION=$VERSION" >> $GITHUB_ENV
+                #   echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
                   # gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${VERSION}
-                else
+                
                   cd target
                   VERSION=$(ls *.jar | sed -E 's/.*-(.*)\.jar/\1/')
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
