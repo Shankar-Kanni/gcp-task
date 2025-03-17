@@ -65,11 +65,12 @@ jobs:
               id: jar_version
               run : |
                 if grep -q "SNAPSHOT" pom.xml; then
-                  cd target
+                  cd .m2/repository/
+                  ls *.jar
                   VERSION=$(ls *.jar | sed -E 's/.*-(.*?)-SNAPSHOT\.jar/\1/')
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
                   echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-                  gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${VERSION}
+                  # gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${VERSION}
                 else
                   cd target
                   VERSION=$(ls *.jar | sed -E 's/.*-(.*)\.jar/\1/')
