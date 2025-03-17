@@ -10,8 +10,6 @@ on:
     pull_request: 
       branches:
         - main
-        - dev
-        - release
       types:
         - closed
         - opened
@@ -54,6 +52,8 @@ jobs:
               run : |
                 SNAPSHOT=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}') >> $GITHUB_ENV
                 gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${SNAPSHOT}
+
+                
     Comment-PR-on-Success:
       runs-on: ubuntu-latest
       needs: [build-spring-boot]
