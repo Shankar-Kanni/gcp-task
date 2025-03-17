@@ -48,7 +48,11 @@ jobs:
             - name: Build SNAPSHOT jar
               if: ${{ github.event.pull_request.state == 'open' && github.event.action == 'opened' }} || ${{ github.event.ref == 'refs/heads/test' }}
               run: |
-                mvn clean deploy --file pom.xml
+                if grep -q "SNAPSHOT" pom.xml; then
+                  mvn clean deploy --file pom.xml
+                else
+                  echo "No actions required in this step"
+                fi
 
             - name: Build the final release jar
               if: ${{ github.event.pull_request.merged == true }}
