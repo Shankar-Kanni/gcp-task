@@ -57,9 +57,8 @@ jobs:
             - name: Build the final release jar
               if: ${{ github.event.pull_request.merged == true }}
               run: |
-                  mvn release:prepare --file pom.xml
-                  sleep 3
-                  mvn release:perform --file pom.xml
+                  mvn clean deploy --file pom.xml
+
               
             - name: Check the Jar availability on the GCP artifactory
               id: jar_version
