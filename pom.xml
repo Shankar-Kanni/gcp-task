@@ -68,7 +68,7 @@
         <enabled>true</enabled>
       </snapshots>
     </repository>
-    <repositories>
+    
     <repository>
       <id>artifact-release</id>
       <url>artifactregistry://europe-west3-maven.pkg.dev/gcp-gke-453620/java-release</url>
