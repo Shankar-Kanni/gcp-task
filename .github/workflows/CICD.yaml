@@ -58,7 +58,7 @@ jobs:
                   cd target
                   VERSION=$(ls *.jar | sed -E 's/.*-(.*)\.jar/\1/') >> $GITHUB_ENV
                   gcloud artifacts files list --project gcp-gke-453620 --repository java-release --location europe-west3 --package com.example:demo --version ${VERSION}
-
+                fi
 
     Comment-PR-on-Success:
       runs-on: ubuntu-latest
