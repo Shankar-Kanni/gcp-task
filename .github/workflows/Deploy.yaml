@@ -3,9 +3,14 @@ name: Deploy the application on GKE cluster
 on:
     workflow_call:
         inputs:
-           namespace:
+          namespace:
             default: dev
             description: "Environment on which application needs to be deployed"
+            type: string
+            required: true
+          IMAGE_TAG:
+            default: v1
+            description: "Provide the input value for image tag"
             type: string
             required: true
 
@@ -30,14 +35,16 @@ jobs:
                 version: '>= 363.0.0'
             - name: Install the gcloud and kubectl and also deploy the app using helm
               run: |
-                IMAGE_TAG=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}'|sed 's/-SNAPSHOT//')
-                IMAGE_TAG=$(echo $IMAGE_TAG | sed -e 's/^[ \t]*//')
+                
+                IMAGE_TAG=${{ inputs.IMAGE_TAG }}
                 echo $IMAGE_TAG
                 gcloud --version
                 gcloud components install kubectl
                 gcloud container clusters list --project gcp-gke-453620
                 gcloud container clusters get-credentials infra-dev-gke-cluster --region europe-west3 --project gcp-gke-453620
                 kubectl get nodes
+                kubectl create ns dev
+                kubectl create ns prod
                 cd helm
                 helm version
                 helm upgrade -i spring-boot -f values.yaml --set image.tag=${IMAGE_TAG} . --namespace ${{ inputs.namespace }}

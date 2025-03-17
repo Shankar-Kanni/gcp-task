@@ -10,7 +10,7 @@
         </parent>
         <groupId>com.example</groupId>
         <artifactId>demo</artifactId>
-        <version>1.1.16-SNAPSHOT</version>
+        <version>1.1.17</version>
         <name>demo</name>
         <description>Demo project for Spring Boot</description>
         <url/>
@@ -48,19 +48,30 @@
 
 		<distributionManagement>
     <snapshotRepository>
-      <id>artifact-registry</id>
+      <id>artifact-snapshot</id>
       <url>artifactregistry://europe-west3-maven.pkg.dev/gcp-gke-453620/java-maven</url>
     </snapshotRepository>
     <repository>
-      <id>artifact-registry</id>
-      <url>artifactregistry://europe-west3-maven.pkg.dev/gcp-gke-453620/java-maven</url>
+      <id>artifactory-release</id>
+      <url>artifactregistry://europe-west3-maven.pkg.dev/gcp-gke-453620/java-release</url>
     </repository>
   </distributionManagement>
 
   <repositories>
     <repository>
-      <id>artifact-registry</id>
+      <id>artifact-snapshot</id>
       <url>artifactregistry://europe-west3-maven.pkg.dev/gcp-gke-453620/java-maven</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    
+    <repository>
+      <id>artifact-release</id>
+      <url>artifactregistry://europe-west3-maven.pkg.dev/gcp-gke-453620/java-release</url>
       <releases>
         <enabled>true</enabled>
       </releases>
