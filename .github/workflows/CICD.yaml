@@ -125,8 +125,8 @@ jobs:
         runs-on: ubuntu-latest
         env:
           IMAGE_TAG: ${{ needs.build-spring-boot.outputs.VERSION }}
-        # outputs:
-        #   IMAGE_TAG: ${{ steps.docker_image.outputs.IMAGE_TAG }}
+        outputs:
+          IMAGE_TAG: ${{ steps.docker_image.outputs.IMAGE_TAG }}
         steps:
             - name: Checkout Repo
               uses: actions/checkout@v4
@@ -169,7 +169,8 @@ jobs:
             - name: Build docker image and push to Artifactory
               id: docker_image
               run: |
-                
+                echo $IMAGE_TAG
+                echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
                 # gcloud auth configure-docker europe-west3-docker.pkg.dev
                 # cat ${{ github.workspace }}/gha-creds*.json | base64 | docker login -u _json_key_base64 --password-stdin https://europe-west3-docker.pkg.dev
 
@@ -186,7 +187,7 @@ jobs:
       uses: ./.github/workflows/Deploy.yaml        
       with:
         namespace: dev
-        IMAGE_TAG: ${{ needs.build-spring-boot.outputs.VERSION }}
+        IMAGE_TAG: ${{ needs.dockerization.outputs.IMAGE_TAG }}
       permissions:
         id-token: write
       secrets: inherit
