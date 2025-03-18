@@ -1,6 +1,6 @@
 [![Spring Boot CI/CD pipeline for GCP/GKE](https://github.com/Shankar-Kanni/gcp-task/actions/workflows/CICD.yaml/badge.svg)](https://github.com/Shankar-Kanni/gcp-task/actions/workflows/CICD.yaml)
 
-End 2 end CICP pipeline for Java springboot application
+End 2 end CICD pipeline for Java springboot application
 Tools used :
   1. Github actions as CICD tool
   2. Maven for build and release
