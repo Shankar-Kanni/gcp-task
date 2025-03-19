@@ -42,7 +42,7 @@ jobs:
               uses: actions/setup-java@v4
               with:
                 distribution: 'zulu' # See 'Supported distributions' for available options
-                java-version: '21'
+                java-version: '17'
 
             - name: 'Set up Cloud SDK'
               uses: 'google-github-actions/setup-gcloud@v2'
