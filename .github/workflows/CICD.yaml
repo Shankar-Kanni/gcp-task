@@ -54,11 +54,7 @@ jobs:
               run: |
                 #if grep -q "SNAPSHOT" pom.xml; then
                 mvn help:evaluate -Dexpression=project.version -q -DforceStdout
-                mvn clean install --file pom.xml sonar:sonar \
-                -Dsonar.token=${{ secrets.SONAR_KEY }} \
-                -Dsonar.host.url=https://sonarcloud.io \
-                -Dsonar.organization=shankar-kanni \
-                -Dsonar.projectKey=Shankar-Kanni_gcp-task
+                mvn clean install --file pom.xml
                 # else
                 #   echo "No actions required in this step"
                 # fi
@@ -66,11 +62,7 @@ jobs:
             - name: Build the final release jar
               if: ${{ github.event.pull_request.merged == true }}
               run: |
-                  mvn clean deploy --file pom.xml sonar:sonar \
-                  -Dsonar.token=${{ secrets.SONAR_KEY }} \
-                  -Dsonar.host.url=https://sonarcloud.io \
-                  -Dsonar.organization=shankar-kanni \
-                  -Dsonar.projectKey=Shankar-Kanni_gcp-task
+                  mvn clean deploy --file pom.xml
 
               
             - name: Check the Jar availability on the GCP artifactory
@@ -103,11 +95,10 @@ jobs:
         - name: Post a comment if build is successful
           run: |
             pull_request_number=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-            sonar=$(cat target/sonar/report-task.txt | grep dashboard | sed 's/dashboardUrl=/Sorar Results: /g')
             curl -X POST \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
-              -d "{\"body\": \"### PR - #$pull_request_number. \n ### ✅ Build succeeded! Great job! 🎉 \n #$sonar\"}" \
+              -d "{\"body\": \"### PR - #$pull_request_number. \n ### ✅ Build succeeded! Great job! 🎉 \"}" \
               https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments
     
     Comment-PR-on-Failure: 
