@@ -28,6 +28,11 @@
         </scm>
         <properties>
                 <java.version>17</java.version>
+                <sonar.host.url>https://sonarcloud.io</sonar.host.url> <!-- Your SonarQube server URL -->
+                <sonar.projectKey>Shankar-Kanni_gcp-task</sonar.projectKey>  <!-- Your project key in SonarQube -->
+                <sonar.projectName>gcp-task</sonar.projectName>
+                <sonar.projectVersion>1.0</sonar.projectVersion>
+                <sonar.jacoco.reportPaths>target/site/jacoco/jacoco.xml</sonar.jacoco.reportPaths>
         </properties>
         <dependencies>
                 <dependency>
@@ -87,6 +92,32 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-maven-plugin</artifactId>
         </plugin>
+        <plugin>
+            <groupId>org.jacoco</groupId>
+            <artifactId>jacoco-maven-plugin</artifactId>
+            <version>0.8.7</version> <!-- Use the latest version -->
+              <executions>
+                <execution>
+                <id>prepare-agent</id>
+                <goals>
+                  <goal>prepare-agent</goal> <!-- Prepares JaCoCo agent during tests -->
+                </goals>
+              </execution>
+              <execution>
+                  <id>generate-report</id>
+                <goals>
+                  <goal>report</goal> <!-- Generates the code coverage report -->
+                </goals>
+                <phase>verify</phase> <!-- Run after tests but before the Sonar analysis -->
+              </execution>
+            </executions>
+      </plugin>
+                        <plugin>
+                              <groupId>org.sonarsource.scanner.maven</groupId>
+                              <artifactId>sonar-maven-plugin</artifactId>
+                              <version>3.9.0.2155</version> <!-- Make sure you're using the latest version -->
+                        </plugin>
+
     </plugins>
     <extensions>
       <extension>
