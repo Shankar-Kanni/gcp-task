@@ -103,10 +103,11 @@ jobs:
         - name: Post a comment if build is successful
           run: |
             pull_request_number=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+            sonar=$(cat target/sonar/report-task.txt | grep dashboard | sed 's/dashboardUrl=/Sorar Results: /g')
             curl -X POST \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
-              -d "{\"body\": \"### PR - #$pull_request_number. \n ### ✅ Build succeeded! Great job! 🎉 \"}" \
+              -d "{\"body\": \"### PR - #$pull_request_number. \n ### ✅ Build succeeded! Great job! 🎉 \n #$sonar\"}" \
               https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments
     
     Comment-PR-on-Failure: 
