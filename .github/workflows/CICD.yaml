@@ -58,7 +58,7 @@ jobs:
                 
                 cp target/*.jar spring-boot.jar
                 docker build --tag spring-boot:${{ github.sha }} .
-                docket images
+                docker images
                 docker run --name spring-boot-app -d \
                 -p 8080:8080 spring-boot:${{ github.sha }}
                 echo Testing Image URL using wget 
