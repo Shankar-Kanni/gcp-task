@@ -3,13 +3,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;  
 
 @RestController  
-public class HelloWorldController   
+public class AppController   
 {  
-@RequestMapping("/api/hello")  
-public String hello()   
+@RequestMapping("/api/app/health")  
+public String healthCall()   
 {  
-return "Hello World ..!!!  CI/CD App up and running";  
-
+return "GCP Application up and running";  
 }  
-
-}  
+} 
