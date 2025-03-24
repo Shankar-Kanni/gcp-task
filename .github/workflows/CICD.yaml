@@ -36,6 +36,7 @@ jobs:
                 project_id: ${{ secrets.PROJECTID }}
                 workload_identity_provider: ${{ secrets.workload_identity_provider }}
                 service_account: ${{ secrets.service_account }}
+                token_format: access_token
               
 
             - name: Setup required Java JDK
@@ -52,12 +53,16 @@ jobs:
             - name: Build SNAPSHOT jar
               if: ${{ github.event.pull_request.merged == false }}
               run: |
-                #if grep -q "SNAPSHOT" pom.xml; then
                 mvn help:evaluate -Dexpression=project.version -q -DforceStdout
                 mvn clean install --file pom.xml
-                # else
-                #   echo "No actions required in this step"
-                # fi
+                
+                cp target/*.jar spring-boot.jar
+                docker build --tag spring-boot:${{ github.sha }} .
+                docket images
+                docker run --name spring-boot-app -d \
+                -p 8080:8080 spring-boot:${{ github.sha }}
+                echo Testing Image URL using wget 
+                wget -q -O - localhost:8080/api/app/health | grep up
 
             - name: Build the final release jar
               if: ${{ github.event.pull_request.merged == true }}
@@ -69,20 +74,36 @@ jobs:
               id: jar_version
               if: ${{ github.event.pull_request.merged == true }}
               run : |
-                # if grep -q "SNAPSHOT" pom.xml; then
-                #   cd .m2/repository/
-                #   ls *.jar
-                #   VERSION=$(ls *.jar | sed -E 's/.*-(.*?)-SNAPSHOT\.jar/\1/')
-                #   echo "VERSION=$VERSION" >> $GITHUB_ENV
-                #   echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-                  # gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${VERSION}
-                
                   cd target
                   VERSION=$(ls *.jar | sed -E 's/.*-(.*)\.jar/\1/')
                   echo "VERSION=$VERSION" >> $GITHUB_ENV
                   echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
                   gcloud artifacts files list --project gcp-gke-453620 --repository java-release --location europe-west3 --package com.example:demo --version ${VERSION}
-                # fi
+
+            - name: Login to Google Artifactory
+              if: ${{ github.event.pull_request.merged == true }}
+              uses: docker/login-action@v3
+              with:
+                registry: europe-west3-docker.pkg.dev
+                username: oauth2accesstoken
+                password: ${{ steps.auth.outputs.access_token }}
+
+            - name: Build docker image and push to Artifactory
+              id: docker_image
+              if: ${{ github.event.pull_request.merged == true }}
+              run: |
+
+                cp target/*.jar spring-boot.jar
+                docker build -f Dockerfile --tag "europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${VERSION}" .
+                docker push europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${VERSION}
+
+                docker images
+                docker run --name spring-boot-app -d  \
+                  -p 8080:8080 \
+                  europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${VERSION}
+                docker ps
+                echo Testing Image URL using wget 
+                wget -q -O - localhost:8080/api/app/health | grep up
 
     Comment-PR-on-Success:
       runs-on: ubuntu-latest
@@ -118,86 +139,86 @@ jobs:
               https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments
               
                     
-    dockerization:
-        name: Containerization
-        needs: [build-spring-boot]
-        if: ${{ github.event.pull_request.merged == true }}
-        permissions: write-all
-        runs-on: ubuntu-latest
-        env:
-          IMAGE_TAG: ${{ needs.build-spring-boot.outputs.VERSION }}
-        outputs:
-          IMAGE_TAG: ${{ steps.docker_image.outputs.IMAGE_TAG }}
-        steps:
-            - name: Checkout Repo
-              uses: actions/checkout@v4
+    # dockerization:
+    #     name: Containerization
+    #     needs: [build-spring-boot]
+    #     if: ${{ github.event.pull_request.merged == true }}
+    #     permissions: write-all
+    #     runs-on: ubuntu-latest
+    #     env:
+    #       IMAGE_TAG: ${{ needs.build-spring-boot.outputs.VERSION }}
+    #     outputs:
+    #       IMAGE_TAG: ${{ steps.docker_image.outputs.IMAGE_TAG }}
+    #     steps:
+    #         - name: Checkout Repo
+    #           uses: actions/checkout@v4
 
-            - name: Authenticate to GCP account
-              id: auth
-              uses: 'google-github-actions/auth@v2'
-              with:
-                project_id: ${{ secrets.PROJECTID }}
-                workload_identity_provider: ${{ secrets.workload_identity_provider }}
-                service_account: ${{ secrets.service_account }}
-                token_format: access_token
+    #         - name: Authenticate to GCP account
+    #           id: auth
+    #           uses: 'google-github-actions/auth@v2'
+    #           with:
+    #             project_id: ${{ secrets.PROJECTID }}
+    #             workload_identity_provider: ${{ secrets.workload_identity_provider }}
+    #             service_account: ${{ secrets.service_account }}
+    #             token_format: access_token
 
-            - name: 'Set up Cloud SDK'
-              uses: 'google-github-actions/setup-gcloud@v2'
-              with:
-                version: '>= 363.0.0'
+    #         - name: 'Set up Cloud SDK'
+    #           uses: 'google-github-actions/setup-gcloud@v2'
+    #           with:
+    #             version: '>= 363.0.0'
 
-            - name: Download the jar file
-              run: |
+    #         - name: Download the jar file
+    #           run: |
                 
-                gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${IMAGE_TAG} | grep jar | head -1
-                JAR=$(gcloud artifacts files list --project gcp-gke-453620 --repository java-release --location europe-west3 --package com.example:demo --version 1.0.13 | grep jar | head -1 | sed -E 's/.*\/(demo-[^\/]+\.jar)/\1/' | awk '{print $1}') >> $GITHUB_ENV
-                echo $JAR
+    #             gcloud artifacts files list --project gcp-gke-453620 --repository java-maven --location europe-west3 --package com.example:demo --version ${IMAGE_TAG} | grep jar | head -1
+    #             JAR=$(gcloud artifacts files list --project gcp-gke-453620 --repository java-release --location europe-west3 --package com.example:demo --version 1.0.13 | grep jar | head -1 | sed -E 's/.*\/(demo-[^\/]+\.jar)/\1/' | awk '{print $1}') >> $GITHUB_ENV
+    #             echo $JAR
                 
-                URL="https://artifactregistry.googleapis.com/download/v1/projects/gcp-gke-453620/locations/europe-west3/repositories/java-release/files/com%2Fexample%2Fdemo#${IMAGE_TAG}#demo-${IMAGE_TAG}.jar:download?alt=media"
-                echo $URL | sed 's/#/%2F/g'
-                curl -X GET -k -H "Authorization: Bearer $(gcloud auth print-access-token)" --output spring-boot.jar -k "$(echo $URL | sed 's/#/%2F/g')"
+    #             URL="https://artifactregistry.googleapis.com/download/v1/projects/gcp-gke-453620/locations/europe-west3/repositories/java-release/files/com%2Fexample%2Fdemo#${IMAGE_TAG}#demo-${IMAGE_TAG}.jar:download?alt=media"
+    #             echo $URL | sed 's/#/%2F/g'
+    #             curl -X GET -k -H "Authorization: Bearer $(gcloud auth print-access-token)" --output spring-boot.jar -k "$(echo $URL | sed 's/#/%2F/g')"
 
-                ls -lrth | grep "jar"
+    #             ls -lrth | grep "jar"
             
             
-            - name: Login to Google Artifactory
-              uses: docker/login-action@v3
-              with:
-                registry: europe-west3-docker.pkg.dev
-                username: oauth2accesstoken
-                password: ${{ steps.auth.outputs.access_token }}
+    #         - name: Login to Google Artifactory
+    #           uses: docker/login-action@v3
+    #           with:
+    #             registry: europe-west3-docker.pkg.dev
+    #             username: oauth2accesstoken
+    #             password: ${{ steps.auth.outputs.access_token }}
 
-            - name: Build docker image and push to Artifactory
-              id: docker_image
-              run: |
-                echo $IMAGE_TAG
-                echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
-                # gcloud auth configure-docker europe-west3-docker.pkg.dev
-                # cat ${{ github.workspace }}/gha-creds*.json | base64 | docker login -u _json_key_base64 --password-stdin https://europe-west3-docker.pkg.dev
+    #         - name: Build docker image and push to Artifactory
+    #           id: docker_image
+    #           run: |
+    #             echo $IMAGE_TAG
+    #             echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_OUTPUT
+    #             # gcloud auth configure-docker europe-west3-docker.pkg.dev
+    #             # cat ${{ github.workspace }}/gha-creds*.json | base64 | docker login -u _json_key_base64 --password-stdin https://europe-west3-docker.pkg.dev
 
-                # IMAGE_TAG=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}'|sed 's/-SNAPSHOT//')
-                # IMAGE_TAG=$(echo $IMAGE_TAG | sed -e 's/^[ \t]*//')
-                # echo "IMAGE_TAG=$(echo $IMAGE_TAG | sed -e 's/^[ \t]*//')" >> $GITHUB_OUTPUT
-                docker build -f Dockerfile --tag "europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}" .
-                docker push europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}
+    #             # IMAGE_TAG=$(cat pom.xml | grep "SNAPSHOT" | sed 's/<version>//g' | awk -F'</version>' '{print $1}'|sed 's/-SNAPSHOT//')
+    #             # IMAGE_TAG=$(echo $IMAGE_TAG | sed -e 's/^[ \t]*//')
+    #             # echo "IMAGE_TAG=$(echo $IMAGE_TAG | sed -e 's/^[ \t]*//')" >> $GITHUB_OUTPUT
+    #             docker build -f Dockerfile --tag "europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}" .
+    #             docker push europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}
 
-                docker images
-                docker run --name spring-boot-app -d  \
-                  -p 8080:8080 \
-                  europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}
-                docker ps
-                echo Testing Image URL using wget 
-                wget -q -O - localhost:8080/api/app/health | grep up
+    #             docker images
+    #             docker run --name spring-boot-app -d  \
+    #               -p 8080:8080 \
+    #               europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}
+    #             docker ps
+    #             echo Testing Image URL using wget 
+    #             wget -q -O - localhost:8080/api/app/health | grep up
                 
     deployment_on_dev:
       name: Dev Deployment
       if: ${{ github.event.pull_request.merged == true }}
       # if: github.ref == 'refs/heads/dev' || github.event_name == 'pull_request' && github.base_ref == 'dev'
-      needs: [dockerization]
+      needs: [build-spring-boot]
       uses: ./.github/workflows/Deploy.yaml        
       with:
         namespace: dev
-        IMAGE_TAG: ${{ needs.dockerization.outputs.IMAGE_TAG }}
+        IMAGE_TAG: ${{ needs.build-spring-boot.outputs.VERSION }}
       permissions:
         id-token: write
       secrets: inherit
