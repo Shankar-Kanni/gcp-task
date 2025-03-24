@@ -50,7 +50,7 @@ jobs:
                 version: '>= 363.0.0'
 
             - name: Build SNAPSHOT jar
-              if: ${{ github.event.pull_request.merged == false }} || ${{ github.event.ref == 'refs/heads/test' }}
+              if: ${{ github.event.pull_request.merged == false }}
               run: |
                 #if grep -q "SNAPSHOT" pom.xml; then
                 mvn help:evaluate -Dexpression=project.version -q -DforceStdout
