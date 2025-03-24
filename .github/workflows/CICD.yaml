@@ -187,7 +187,7 @@ jobs:
                   europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${IMAGE_TAG}
                 docker ps
                 echo Testing Image URL using wget 
-                wget -q -O - localhost:8080/api/hello | grep Hello
+                wget -q -O - localhost:8080/api/app/health | grep up
                 
     deployment_on_dev:
       name: Dev Deployment
