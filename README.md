@@ -1,11 +1,10 @@
-#Steps to change the public IP for micro8ks which is running on Google Compute Engine
+[![Spring Boot CI/CD pipeline for GCP/GKE](https://github.com/Shankar-Kanni/gcp-task/actions/workflows/CICD.yaml/badge.svg)](https://github.com/Shankar-Kanni/gcp-task/actions/workflows/CICD.yaml)
 
-```t
-shankarkanni80@gcptutorials-vm:/var/snap/microk8s/current/certs$ cat csr.conf.template | grep IP.99
-IP.99 = 34.45.120.47
-shankarkanni80@gcptutorials-vm:/var/snap/microk8s/current/certs$ vi csr.conf.template 
-shankarkanni80@gcptutorials-vm:/var/snap/microk8s/current/certs$ cd /var/snap/microk8s/current/certs/
-shankarkanni80@gcptutorials-vm:/var/snap/microk8s/current/certs$ cat csr.conf.template | grep IP.99
-IP.99 = 34.69.120.105
-shankarkanni80@gcptutorials-vm:/var/snap/microk8s/current/certs$ 
-```
+End 2 end CICD pipeline for Java springboot application
+Tools used :
+  1. Github actions as CICD tool
+  2. Maven for build and release
+  3. Docker building image
+  4. GCP artifactory for storing the artifacts and docker image
+  5. Helm charts for deploying the application on GKE
+  6. GKE to run containers
