@@ -26,6 +26,7 @@ jobs:
         runs-on: ubuntu-latest
         outputs:
           VERSION: ${{ steps.jar_version.outputs.VERSION }}
+          SONAR: ${{ steps.sonar.outputs.SONAR }}
         steps:  
             - name: Checkout Repo
               uses: actions/checkout@v4
@@ -52,6 +53,7 @@ jobs:
                 version: '>= 363.0.0'
 
             - name: Build SNAPSHOT version and test the application
+              id: sonar
               if: ${{ github.event.pull_request.merged == false }}
               run: |
                 mvn help:evaluate -Dexpression=project.version -q -DforceStdout
@@ -61,6 +63,9 @@ jobs:
                 -Dsonar.organization=shankar-kanni \
                 -Dsonar.projectKey=Shankar-Kanni_gcp-task
                 
+                cd target/sonar
+                sonar=$(cat report-task.txt | grep dash)
+                echo "SONAR=$sonar">> $GITHUB_OUTPUT
                 cp target/*.jar spring-boot.jar
                 docker build --tag spring-boot:${{ github.sha }} .
                 docker images
@@ -124,7 +129,7 @@ jobs:
             curl -X POST \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
-              -d "{\"body\": \"### PR - #$pull_request_number. \n ### ✅ Build succeeded! Great job! 🎉 \"}" \
+              -d "{\"body\": \"### PR - #$pull_request_number. \n ### ✅ Build succeeded! Great job! 🎉 \n ${{ needs.Build-App-Test.outputs.SONAR }} \"}" \
               https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments
     
     Comment-PR-on-Failure: 
@@ -140,7 +145,7 @@ jobs:
             curl -X POST \
               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
               -H "Accept: application/vnd.github.v3+json" \
-              -d "{\"body\": \"### PR - #$pull_request_number. \n ### ❌ Build failed! Please check the logs. 🚨 \"}" \
+              -d "{\"body\": \"### PR - #$pull_request_number. \n ### ❌ Build failed! Please check the logs. 🚨 \n ${{ needs.Build-App-Test.outputs.SONAR }} \"}" \
               https://api.github.com/repos/${{ github.repository }}/issues/${{ github.event.pull_request.number }}/comments
                                  
                 
