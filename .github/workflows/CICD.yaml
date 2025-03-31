@@ -55,7 +55,11 @@ jobs:
               if: ${{ github.event.pull_request.merged == false }}
               run: |
                 mvn help:evaluate -Dexpression=project.version -q -DforceStdout
-                mvn clean install --file pom.xml
+                mvn clean install --file pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
+                -Dsonar.token=cd169a1104af625121e6fa70045073c69321825a \
+                -Dsonar.host.url=https://sonarcloud.io \
+                -Dsonar.organization=shankar-kanni \
+                -Dsonar.projectKey=Shankar-Kanni_gcp-task
                 
                 cp target/*.jar spring-boot.jar
                 docker build --tag spring-boot:${{ github.sha }} .
