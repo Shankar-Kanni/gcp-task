@@ -60,8 +60,8 @@ jobs:
                 mvn clean install --file pom.xml org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                 -Dsonar.token=${{ secrets.SONAR_KEY }} \
                 -Dsonar.host.url=https://sonarcloud.io \
-                -Dsonar.organization=shankar-kanni \
-                -Dsonar.projectKey=Shankar-Kanni_gcp-task
+                -Dsonar.organization=shankar-kanni-1 \
+                -Dsonar.projectKey=shankar-kanni-1_gcp
                 
                 # cd target/sonar
                 sonar=$(cat target/sonar/report-task.txt | grep dash)
