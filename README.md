@@ -6,5 +6,5 @@ Tools used :
   2. Maven for build and release
   3. Docker building image
   4. GCP artifactory for storing the artifacts and docker image
-  5. Helm charts for deploying the application on GKE
-  6. GKE to run containers
+  5. Helm charts for deploying the application on GKE.
+  6. GKE to run containers.
