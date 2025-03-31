@@ -63,8 +63,8 @@ jobs:
                 -Dsonar.organization=shankar-kanni \
                 -Dsonar.projectKey=Shankar-Kanni_gcp-task
                 
-                cd target/sonar
-                sonar=$(cat report-task.txt | grep dash)
+                # cd target/sonar
+                sonar=$(cat target/sonar/report-task.txt | grep dash)
                 echo "SONAR=$sonar">> $GITHUB_OUTPUT
                 cp target/*.jar spring-boot.jar
                 docker build --tag spring-boot:${{ github.sha }} .
