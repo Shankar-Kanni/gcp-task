@@ -29,7 +29,7 @@ jobs:
           SONAR: ${{ steps.sonar.outputs.SONAR }}
         steps:  
             - name: Checkout Repo
-              uses: actions/checkout@v4
+              uses: actions/checkout@v3
               with:
                 fetch-depth: 0
 
@@ -79,7 +79,7 @@ jobs:
 
             - name: Bump Version
               if: ${{ github.event.pull_request.merged == true }}
-              uses: ./.github/actions/bump_version@main
+              uses: ./.github/actions/bump_version
 
             - name: Build the final release version of app and test
               if: ${{ github.event.pull_request.merged == true }}
