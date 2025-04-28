@@ -30,6 +30,9 @@ jobs:
         steps:  
             - name: Checkout Repo
               uses: actions/checkout@v4
+              with:
+                fetch-depth: 0
+
 
             - name: Authenticate to GCP account
               id: auth
@@ -73,6 +76,10 @@ jobs:
                 -p 8080:8080 spring-boot:${{ github.sha }}
                 echo Testing Image URL using wget 
                 wget -q -O - localhost:8080/api/app/health | grep up
+
+            - name: Bump Version
+              if: ${{ github.event.pull_request.merged == true }}
+              uses: ./.github/actions/bump_version@main
 
             - name: Build the final release version of app and test
               if: ${{ github.event.pull_request.merged == true }}
