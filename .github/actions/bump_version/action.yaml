@@ -18,6 +18,7 @@ runs:
         TITLE="${{ github.event.pull_request.title }}"
         CURRENT_TAG="${{ steps.get_latest_tag.outputs.tag }}"
         VERSION="${CURRENT_TAG#v}"
+        echo $VERSION
         echo "VERSION=$VERSION" >> $GITHUB_ENV
         cp .github/actions/bump_version/version.sh version.sh
         chmod +x version.sh
