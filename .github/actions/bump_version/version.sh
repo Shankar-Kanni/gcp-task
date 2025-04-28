@@ -1,7 +1,7 @@
 if [ -n "$1" ]; then
     case "$1" in
         "minor")
-            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            #VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
                         # Assuming the current version is x.y.z
                         IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
                         MINOR=${VERSION_PARTS[1]}
@@ -12,7 +12,7 @@ if [ -n "$1" ]; then
                         mvn versions:set -DnewVersion=$NEW_VERSION
             ;;
         "major")
-            VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+            #VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
                         # Assuming the current version is x.y.z
                         IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
                         MAJOR=${VERSION_PARTS[0]}
@@ -24,7 +24,7 @@ if [ -n "$1" ]; then
             ;;
     esac
 else
-        VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+        #VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
         # Assuming the current version is x.y.z
         IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
         PATCH=${VERSION_PARTS[2]}

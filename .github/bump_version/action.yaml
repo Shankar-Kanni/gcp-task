@@ -1,9 +1,0 @@
-name: Bump the release version
-
-runs:
-  using: "composite"
-  steps:
-    - name: Read the title name
-      run: |
-        PR_TITLE=${{ github.event.pull_request.title }}
-        
