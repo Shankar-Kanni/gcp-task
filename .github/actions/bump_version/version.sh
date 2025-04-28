@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
 VERSION=${VERSION}
 echo $VERSION
 if [ -n "$1" ]; then
