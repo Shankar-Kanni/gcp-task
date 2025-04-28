@@ -30,6 +30,7 @@ runs:
           cp .github/actions/bump_version/version.sh version.sh
           ./version.sh
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+        fi
           
     - name: Create and push new tag
       shell: bash
