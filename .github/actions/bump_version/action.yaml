@@ -19,16 +19,15 @@ runs:
         CURRENT_TAG="${{ steps.get_latest_tag.outputs.tag }}"
         VERSION="${CURRENT_TAG#v}"
         echo "VERSION=$VERSION" >> $GITHUB_ENV
+        cp .github/actions/bump_version/version.sh version.sh
+        chmod +x version.sh
         if [[ $TITLE == *major* ]]; then
-          cp .github/actions/bump_version/version.sh version.sh
           ./version.sh major
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
         elif [[ $TITLE == *minor* ]]; then
-          cp .github/actions/bump_version/version.sh version.sh
           ./version.sh minor
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
         else
-          cp .github/actions/bump_version/version.sh version.sh
           ./version.sh
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
         fi
