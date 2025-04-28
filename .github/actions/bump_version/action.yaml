@@ -23,13 +23,13 @@ runs:
         cp .github/actions/bump_version/version.sh version.sh
         chmod +x version.sh
         if [[ $TITLE == *major* ]]; then
-          ./version.sh major
+          ./version.sh major ${VERSION}
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
         elif [[ $TITLE == *minor* ]]; then
-          ./version.sh minor
+          ./version.sh minor ${VERSION}
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
         else
-          ./version.sh
+          ./version.sh patch ${VERSION}
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
         fi
           

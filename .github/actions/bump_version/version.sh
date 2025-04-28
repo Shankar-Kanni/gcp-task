@@ -8,7 +8,7 @@ if [ -n "$1" ]; then
         "minor")
             #VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
                         # Assuming the current version is x.y.z
-                        IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
+                        IFS='.' read -r -a VERSION_PARTS <<< "$2"
                         MINOR=${VERSION_PARTS[1]}
                         MINOR=$((MINOR + 1))  # Increment PATCH version
                         NEW_VERSION="${VERSION_PARTS[0]}.$MINOR.0"
@@ -19,7 +19,7 @@ if [ -n "$1" ]; then
         "major")
             #VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
                         # Assuming the current version is x.y.z
-                        IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
+                        IFS='.' read -r -a VERSION_PARTS <<< "$2"
                         MAJOR=${VERSION_PARTS[0]}
                         MAJOR=$((MAJOR + 1))  # Increment PATCH version
                         NEW_VERSION="${MAJOR}.0.0"
@@ -31,7 +31,7 @@ if [ -n "$1" ]; then
 else
         #VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
         # Assuming the current version is x.y.z
-        IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
+        IFS='.' read -r -a VERSION_PARTS <<< "$2"
         PATCH=${VERSION_PARTS[2]}
         PATCH=$((PATCH + 1))  # Increment PATCH version
         NEW_VERSION="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$PATCH"
