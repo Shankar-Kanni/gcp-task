@@ -36,7 +36,9 @@ runs:
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
         fi
     - name: Create a release on pom.xml
-      run: mvn versions:set -DnewVersion=$NEW_VERSION      
+      shell: bash
+      run: mvn versions:set -DnewVersion=$NEW_VERSION
+
     - name: Create and push new tag
       shell: bash
       run: |
