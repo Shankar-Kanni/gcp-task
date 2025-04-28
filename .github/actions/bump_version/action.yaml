@@ -20,10 +20,15 @@ runs:
         VERSION="${CURRENT_TAG#v}"
         echo $VERSION
         echo "VERSION=$VERSION" >> $GITHUB_ENV
-        cp .github/actions/bump_version/version.sh version.sh
-        chmod +x version.sh
+        #cp .github/actions/bump_version/version.sh version.sh
+        #chmod +x version.sh
         if [[ $TITLE == *major* ]]; then
-          ./version.sh major ${VERSION}
+          IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
+          MAJOR=${VERSION_PARTS[0]}
+          MAJOR=$((MAJOR + 1))  # Increment PATCH version
+          NEW_VERSION="${MAJOR}.0.0"
+
+          echo "New Version: $NEW_VERSION"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
         elif [[ $TITLE == *minor* ]]; then
@@ -36,7 +41,12 @@ runs:
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
         else
-          ./version.sh patch ${VERSION}
+          IFS='.' read -r -a VERSION_PARTS <<< "$VERSION"
+          PATCH=${VERSION_PARTS[2]}
+          PATCH=$((PATCH + 1))  # Increment PATCH version
+          NEW_VERSION="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$PATCH"
+
+          echo "New Version: $NEW_VERSION"
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
         fi
