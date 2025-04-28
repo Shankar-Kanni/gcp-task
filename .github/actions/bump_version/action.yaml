@@ -5,6 +5,7 @@ runs:
   steps:
     - name: Get latest tag
       id: get_latest_tag
+      shell: bash
       run: |
         TAG=$(git describe --tags --abbrev=0 || echo "v0.0.0")
         echo "Latest tag: $TAG"
@@ -12,6 +13,7 @@ runs:
 
     - name: Parse next version
       id: bump_version
+      shell: bash
       run: |
         TITLE="${{ github.event.pull_request.title }}"
         CURRENT_TAG="${{ steps.get_latest_tag.outputs.tag }}"
@@ -30,6 +32,7 @@ runs:
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
           
     - name: Create and push new tag
+      shell: bash
       run: |
         git config user.name "github-actions"
         git config user.email "github-actions@github.com"
