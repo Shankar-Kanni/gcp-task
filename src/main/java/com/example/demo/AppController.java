@@ -8,6 +8,6 @@ public class AppController
 @RequestMapping("/api/app/health")  
 public String healthCall()   
 {  
-return "GCP Application up and running, health checks passed";  
+return "GCP Application up and running, health checks passed..!!";  
 }  
 } 
