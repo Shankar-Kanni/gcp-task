@@ -98,8 +98,8 @@ jobs:
                   #cd target
                   #VERSION=$(ls *.jar | sed -E 's/.*-(.*)\.jar/\1/')
                   #echo "VERSION=$VERSION" >> $GITHUB_ENV
-                  #echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
-                  gcloud artifacts files list --project gcp-gke-453620 --repository java-release --location europe-west3 --package com.example:demo --version ${VERSION}
+                  echo "VERSION=$NEW_VERSION" >> $GITHUB_OUTPUT
+                  gcloud artifacts files list --project gcp-gke-453620 --repository java-release --location europe-west3 --package com.example:demo --version ${NEW_VERSION}
 
             - name: Login to Google Artifactory
               if: ${{ github.event.pull_request.merged == true }}
@@ -115,13 +115,13 @@ jobs:
               run: |
 
                 cp target/*.jar spring-boot.jar
-                docker build -f Dockerfile --tag "europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${VERSION}" .
-                docker push europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${VERSION}
+                docker build -f Dockerfile --tag "europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${NEW_VERSION}" .
+                docker push europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${NEW_VERSION}
 
                 docker images
                 docker run --name spring-boot-app -d  \
                   -p 8080:8080 \
-                  europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${VERSION}
+                  europe-west3-docker.pkg.dev/gcp-gke-453620/docker-repo/spring-boot-app-v1:${NEW_VERSION}
                 docker ps
                 echo Testing Image URL using wget 
                 wget -q -O - localhost:8080/api/app/health | grep up
