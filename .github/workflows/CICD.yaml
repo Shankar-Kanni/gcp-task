@@ -95,10 +95,10 @@ jobs:
               id: jar_version
               if: ${{ github.event.pull_request.merged == true }}
               run : |
-                  cd target
-                  VERSION=$(ls *.jar | sed -E 's/.*-(.*)\.jar/\1/')
-                  echo "VERSION=$VERSION" >> $GITHUB_ENV
-                  echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+                  #cd target
+                  #VERSION=$(ls *.jar | sed -E 's/.*-(.*)\.jar/\1/')
+                  #echo "VERSION=$VERSION" >> $GITHUB_ENV
+                  #echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
                   gcloud artifacts files list --project gcp-gke-453620 --repository java-release --location europe-west3 --package com.example:demo --version ${VERSION}
 
             - name: Login to Google Artifactory
