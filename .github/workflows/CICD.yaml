@@ -76,7 +76,10 @@ jobs:
                 -p 8080:8080 spring-boot:${{ github.sha }}
                 echo Testing Image URL using wget 
                 wget -q -O - localhost:8080/api/app/health | grep up
-
+                
+            - name: Bump Version
+              if: ${{ github.event.pull_request.merged == true }}
+              uses: ./.github/actions/bump_version
 
             - name: Build the final release version of app and test
               if: ${{ github.event.pull_request.merged == true }}
@@ -87,9 +90,6 @@ jobs:
                   -Dsonar.organization=shankar-kanni-1 \
                   -Dsonar.projectKey=shankar-kanni-1_gcp
 
-            - name: Bump Version
-              if: ${{ github.event.pull_request.merged == true }}
-              uses: ./.github/actions/bump_version
 
               
             - name: Check the Jar availability on the GCP artifactory
