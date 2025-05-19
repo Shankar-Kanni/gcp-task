@@ -53,9 +53,10 @@ jobs:
             - name: Output
               if: always()
               run: |
-                if [[ "$status"!= "OK" ]];
+                if [[ "${{ env.status }}" != "OK" ]]; then
                   echo "❌ Deployment failed, please check logs" >> $GITHUB_STEP_SUMMARY
                   exit 1
                 else
                   echo "✅ Deployment is success." >> $GITHUB_STEP_SUMMARY
+                fi
        
