@@ -48,4 +48,13 @@ jobs:
                 cd helm
                 helm version
                 helm upgrade -i spring-boot -f values.yaml --set image.tag=${IMAGE_TAG} . --namespace ${{ inputs.namespace }}
+                echo "status=OK" >> $GITHUB_ENV
+
+            - name: Output
+              run: |
+                if [[ "$status"!= "OK" ]];
+                  echo "❌ Deployment failed, please check logs" >> $GITHUB_STEP_SUMMARY
+                  exit 1
+                else
+                  echo "✅ Deployment is success." >> $GITHUB_STEP_SUMMARY
        
