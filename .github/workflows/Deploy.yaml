@@ -51,6 +51,7 @@ jobs:
                 echo "status=OK" >> $GITHUB_ENV
 
             - name: Output
+              if: always()
               run: |
                 if [[ "$status"!= "OK" ]];
                   echo "❌ Deployment failed, please check logs" >> $GITHUB_STEP_SUMMARY
