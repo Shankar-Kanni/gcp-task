@@ -45,6 +45,10 @@ jobs:
                 gcloud container clusters list --project gcp-gke-453620
                 gcloud container clusters get-credentials infra-dev-gke-cluster --region europe-west3 --project gcp-gke-453620
                 kubectl get nodes
+                NAMESPACE="dev"
+                if ! kubectl get namespace "$NAMESPACE" >/dev/null 2>&1; then
+                  kubectl create namespace "$NAMESPACE"
+                fi
                 cd helm
                 helm version
                 helm upgrade -i spring-boot -f values.yaml --set image.tag=${IMAGE_TAG} . --namespace ${{ inputs.namespace }}
